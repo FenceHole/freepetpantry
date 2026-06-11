@@ -4,203 +4,296 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Free Pet Pantry — Take what you need, leave what you can</title>
-<meta name="description" content="A free pet food pantry for pet parents in need. Take what you need, leave what you can. Free pet food and essentials in East Pittsburgh, PA. Part of The Fence Hole Group." />
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐾</text></svg>" />
+<meta name="description" content="A free pet food pantry for pet parents in need. Take what you need, leave what you can. Free pet food and essentials in East Pittsburgh, PA, and a growing national network. A project of The Fence Hole Group." />
+<link rel="icon" type="image/png" href="assets/favicon.png" />
 
-<!-- Open Graph -->
 <meta property="og:title" content="Free Pet Pantry — Take what you need, leave what you can" />
-<meta property="og:description" content="A free pet food pantry for pet parents in need. No one should have to choose between feeding their fur babies or themselves." />
+<meta property="og:description" content="Free pet food & essentials for pet parents in need. No one should choose between feeding their fur babies or themselves." />
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://freepetpantry.com" />
 
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+
 <style>
   :root{
-    --bg:#fbf7f0;
-    --surface:#ffffff;
-    --ink:#23201c;
-    --muted:#6c6358;
-    --brand:#2f7d6e;       /* warm teal-green */
-    --brand-dark:#235e53;
-    --accent:#e8743b;      /* warm coral */
-    --accent-soft:#fdeee5;
-    --line:#ece4d8;
-    --shadow:0 10px 30px rgba(35,32,28,.08);
-    --radius:18px;
+    --navy:#13314e; --navy-2:#0e2740; --navy-soft:#1c4368;
+    --cream:#f7f1e1; --cream-2:#fbf7ec; --paper:#fdfaf2;
+    --ink:#1e2a33; --muted:#5d6b73;
+    --orange:#e3852f; --orange-d:#c96f1f;
+    --gold:#d8a23e; --leaf:#4f8f54; --sky:#cfe6ec;
+    --line:#eae0cb;
+    --shadow:0 18px 40px -18px rgba(19,49,78,.35);
+    --shadow-sm:0 8px 20px -10px rgba(19,49,78,.25);
+    --r:20px;
   }
   *{box-sizing:border-box;}
   html{scroll-behavior:smooth;}
   body{
-    margin:0;
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-    color:var(--ink);
-    background:var(--bg);
-    line-height:1.6;
-    -webkit-font-smoothing:antialiased;
+    margin:0; color:var(--ink); background:var(--paper);
+    font-family:"Nunito Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    line-height:1.65; -webkit-font-smoothing:antialiased;
   }
-  h1,h2,h3{line-height:1.15;letter-spacing:-.02em;margin:0 0 .4em;}
-  h1{font-size:clamp(2.1rem,5.5vw,3.6rem);}
-  h2{font-size:clamp(1.6rem,3.5vw,2.4rem);}
+  h1,h2,h3{font-family:"Fraunces",Georgia,serif; line-height:1.1; margin:0 0 .35em; letter-spacing:-.01em; font-weight:600;}
+  h1{font-size:clamp(2.4rem,5.4vw,4.1rem);}
+  h2{font-size:clamp(1.9rem,3.8vw,2.9rem);}
+  h3{font-size:1.3rem;}
   p{margin:0 0 1em;}
-  a{color:var(--brand-dark);}
-  .wrap{max-width:1080px;margin:0 auto;padding:0 22px;}
-  .section{padding:72px 0;}
-  .eyebrow{
-    display:inline-block;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
-    font-size:.78rem;color:var(--accent);margin-bottom:.6em;
-  }
-  .btn{
-    display:inline-block;border:0;cursor:pointer;font:inherit;font-weight:700;
-    padding:14px 26px;border-radius:999px;text-decoration:none;transition:transform .15s ease,box-shadow .15s ease;
-  }
+  a{color:var(--navy); text-decoration:none;}
+  .wrap{max-width:1120px; margin:0 auto; padding:0 24px;}
+  .section{padding:88px 0;}
+  .eyebrow{display:inline-flex;align-items:center;gap:8px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;font-size:.74rem;color:var(--orange-d);margin-bottom:1em;}
+  .eyebrow::before{content:"";width:26px;height:2px;background:var(--orange);border-radius:2px;}
+  .lead{font-size:1.18rem;color:var(--muted);max-width:54ch;}
+  .center{text-align:center;} .center .lead{margin-left:auto;margin-right:auto;} .center .eyebrow::before{display:none;}
+
+  .btn{display:inline-flex;align-items:center;gap:9px;border:0;cursor:pointer;font:inherit;font-weight:800;
+    padding:15px 28px;border-radius:999px;text-decoration:none;transition:transform .15s,box-shadow .15s,background .15s;letter-spacing:.01em;}
+  .btn svg{width:18px;height:18px;}
   .btn:hover{transform:translateY(-2px);}
-  .btn-primary{background:var(--accent);color:#fff;box-shadow:0 8px 20px rgba(232,116,59,.32);}
-  .btn-ghost{background:transparent;color:var(--brand-dark);border:2px solid var(--brand);}
-  .btn-light{background:#fff;color:var(--brand-dark);}
+  .btn-primary{background:var(--orange);color:#fff;box-shadow:0 12px 24px -8px rgba(227,133,47,.6);}
+  .btn-primary:hover{background:var(--orange-d);}
+  .btn-navy{background:var(--navy);color:#fff;}
+  .btn-navy:hover{background:var(--navy-2);}
+  .btn-outline{background:transparent;color:var(--navy);box-shadow:inset 0 0 0 2px var(--navy);}
+  .btn-ghost{background:#fff;color:var(--navy);box-shadow:var(--shadow-sm);}
 
   /* NAV */
-  header.nav{position:sticky;top:0;z-index:50;background:rgba(251,247,240,.9);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);}
-  .nav-inner{display:flex;align-items:center;justify-content:space-between;padding:14px 22px;max-width:1080px;margin:0 auto;}
-  .brand{display:flex;align-items:center;gap:10px;font-weight:800;text-decoration:none;color:var(--ink);font-size:1.05rem;}
-  .brand .paw{font-size:1.5rem;}
-  .nav-links{display:flex;gap:26px;align-items:center;}
-  .nav-links a{text-decoration:none;color:var(--muted);font-weight:600;font-size:.95rem;}
-  .nav-links a:hover{color:var(--ink);}
-  .nav-links .btn{padding:9px 18px;color:#fff;}
-  @media(max-width:760px){.nav-links a:not(.btn){display:none;}}
+  header.nav{position:sticky;top:0;z-index:60;background:rgba(253,250,242,.82);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);}
+  .nav-inner{display:flex;align-items:center;justify-content:space-between;padding:12px 24px;max-width:1120px;margin:0 auto;}
+  .brand{display:flex;align-items:center;gap:12px;font-family:"Fraunces",serif;font-weight:700;font-size:1.15rem;color:var(--navy);}
+  .brand .mark{width:42px;height:42px;border-radius:50%;overflow:hidden;flex:0 0 auto;box-shadow:0 0 0 2px var(--cream),0 4px 10px -4px rgba(19,49,78,.5);}
+  .brand .mark img{width:100%;height:100%;object-fit:cover;display:block;}
+  .nav-links{display:flex;gap:30px;align-items:center;}
+  .nav-links a:not(.btn){color:var(--navy);font-weight:700;font-size:.96rem;opacity:.8;}
+  .nav-links a:not(.btn):hover{opacity:1;}
+  .nav-links .btn{padding:10px 20px;}
+  @media(max-width:840px){.nav-links a:not(.btn){display:none;}}
 
   /* HERO */
-  .hero{background:linear-gradient(160deg,#eaf3f0 0%,#fbf7f0 60%);position:relative;overflow:hidden;}
-  .hero-grid{display:grid;grid-template-columns:1.2fr .9fr;gap:40px;align-items:center;padding:64px 0 72px;}
-  @media(max-width:860px){.hero-grid{grid-template-columns:1fr;text-align:center;}}
-  .hero h1 span{color:var(--brand);}
-  .lede{font-size:1.18rem;color:var(--muted);max-width:46ch;}
-  @media(max-width:860px){.lede{margin-left:auto;margin-right:auto;}}
-  .hero-cta{display:flex;gap:14px;flex-wrap:wrap;margin-top:8px;}
-  @media(max-width:860px){.hero-cta{justify-content:center;}}
-  .hero-art{
-    background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);
-    padding:30px;border:1px solid var(--line);
-  }
-  .hero-art .pantry{font-size:clamp(3rem,10vw,5rem);text-align:center;line-height:1.1;}
-  .hero-art .tagline{text-align:center;font-weight:700;color:var(--brand-dark);margin-top:10px;font-size:1.1rem;}
-  .hero-art .sub{text-align:center;color:var(--muted);font-size:.92rem;}
+  .hero{position:relative;overflow:hidden;background:
+      radial-gradient(120% 80% at 80% -10%, #eaf3ef 0%, transparent 55%),
+      radial-gradient(90% 70% at 0% 110%, #fdeedd 0%, transparent 55%),
+      var(--cream-2);}
+  .hero-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:48px;align-items:center;padding:72px 0 84px;}
+  @media(max-width:880px){.hero-grid{grid-template-columns:1fr;text-align:center;}}
+  .hero h1 em{font-style:italic;color:var(--orange-d);}
+  .hero .cta-row{display:flex;gap:14px;flex-wrap:wrap;margin-top:26px;}
+  @media(max-width:880px){.hero .cta-row{justify-content:center;}}
+  .hero .trust{margin-top:22px;display:flex;gap:8px;align-items:center;color:var(--muted);font-size:.92rem;flex-wrap:wrap;}
+  @media(max-width:880px){.hero .trust{justify-content:center;}}
+  .badge-wrap{display:flex;justify-content:center;}
+  .badge{width:min(360px,80vw);aspect-ratio:1;border-radius:50%;overflow:hidden;
+    box-shadow:0 0 0 10px #fff,0 30px 60px -22px rgba(19,49,78,.55);transform:rotate(-3deg);transition:transform .4s;}
+  .badge:hover{transform:rotate(0);}
+  .badge img{width:100%;height:100%;object-fit:cover;display:block;}
+  .badge.no-logo{box-shadow:0 0 0 10px #fff,0 30px 60px -22px rgba(19,49,78,.55);transform:rotate(-3deg);}
 
-  /* STAT STRIP */
-  .strip{background:var(--brand);color:#fff;}
-  .strip .wrap{display:flex;gap:24px;justify-content:center;flex-wrap:wrap;padding:22px;text-align:center;}
-  .strip b{display:block;font-size:1.5rem;}
-  .strip span{opacity:.85;font-size:.9rem;}
+  /* STRIP */
+  .strip{background:var(--navy);color:#fff;}
+  .strip .wrap{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;padding:30px 24px;text-align:center;}
+  @media(max-width:720px){.strip .wrap{grid-template-columns:repeat(2,1fr);gap:26px;}}
+  .strip b{display:block;font-family:"Fraunces",serif;font-size:1.7rem;color:var(--gold);}
+  .strip span{opacity:.82;font-size:.86rem;letter-spacing:.02em;}
 
   /* CARDS */
-  .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:34px;}
+  .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:42px;}
   @media(max-width:820px){.cards{grid-template-columns:1fr;}}
-  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:28px;box-shadow:var(--shadow);}
-  .card .ic{font-size:2rem;}
-  .card h3{margin-top:14px;font-size:1.2rem;}
+  .card{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:32px;box-shadow:var(--shadow-sm);}
+  .icon{width:54px;height:54px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:var(--cream);color:var(--orange-d);margin-bottom:18px;}
+  .icon svg{width:28px;height:28px;}
+  .card h3{font-family:"Fraunces",serif;}
   .card p{color:var(--muted);margin:0;}
 
   /* DONATE */
-  #donate{background:var(--accent-soft);}
-  .donate-grid{display:grid;grid-template-columns:1fr 1fr;gap:36px;align-items:start;}
-  @media(max-width:820px){.donate-grid{grid-template-columns:1fr;}}
-  .need-list{list-style:none;padding:0;margin:18px 0 0;display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-  .need-list li{background:#fff;border:1px solid var(--line);border-radius:12px;padding:11px 14px;font-weight:600;font-size:.95rem;}
-  .give-box{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:28px;box-shadow:var(--shadow);}
+  #donate{background:linear-gradient(180deg,#fff 0%, var(--cream-2) 100%);}
+  .give-grid{display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-top:42px;}
+  @media(max-width:820px){.give-grid{grid-template-columns:1fr;}}
+  .give-card{position:relative;border-radius:var(--r);padding:34px;color:#fff;overflow:hidden;box-shadow:var(--shadow);}
+  .give-card.amazon{background:linear-gradient(150deg,#1c4368,#13314e);}
+  .give-card.paypal{background:linear-gradient(150deg,#e3852f,#c96f1f);}
+  .give-card .icon{background:rgba(255,255,255,.16);color:#fff;}
+  .give-card h3{font-family:"Fraunces",serif;font-size:1.5rem;margin-bottom:.3em;}
+  .give-card p{opacity:.92;}
+  .give-card .btn{margin-top:14px;background:#fff;color:var(--navy);}
+  .give-card.paypal .btn{color:var(--orange-d);}
+  .give-note{margin-top:26px;text-align:center;color:var(--muted);font-size:.95rem;}
 
   /* VISIT */
-  .visit-grid{display:grid;grid-template-columns:1fr 1fr;gap:36px;align-items:center;}
+  .visit-grid{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center;}
   @media(max-width:820px){.visit-grid{grid-template-columns:1fr;}}
-  .map-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;}
-  .map-card .pin{
-    background:linear-gradient(160deg,#dfeee9,#eaf3f0);height:200px;display:flex;align-items:center;justify-content:center;font-size:3.4rem;
-  }
-  .map-card .info{padding:22px;}
-  .map-card .info .area{font-weight:800;font-size:1.15rem;}
-  .map-card .info .note{color:var(--muted);font-size:.9rem;}
+  .visit-card{background:#fff;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow-sm);}
+  .visit-card .top{height:150px;background:radial-gradient(circle at 50% 40%, #e7f1ec, #d7e7df);display:flex;align-items:center;justify-content:center;color:var(--navy);}
+  .visit-card .top svg{width:62px;height:62px;}
+  .visit-card .body{padding:24px;}
+  .visit-card .area{font-family:"Fraunces",serif;font-size:1.25rem;font-weight:600;}
+  .visit-card .sub{color:var(--muted);font-size:.92rem;}
+
+  /* NETWORK */
+  #network{background:var(--navy);color:#fff;}
+  #network .eyebrow{color:var(--gold);} #network .eyebrow::before{background:var(--gold);}
+  #network .lead{color:#cdd9e3;}
+  #network a{color:var(--gold);}
+  .net-grid{display:grid;grid-template-columns:1.25fr .75fr;gap:34px;margin-top:40px;align-items:start;}
+  @media(max-width:900px){.net-grid{grid-template-columns:1fr;}}
+  #map{height:440px;border-radius:var(--r);box-shadow:var(--shadow);border:4px solid #fff;background:#dfe7ec;z-index:1;}
+  .leaflet-popup-content{font-family:"Nunito Sans",sans-serif;}
+  .pin-pop b{font-family:"Fraunces",serif;color:var(--navy);font-size:1.02rem;}
+  .pin-pop small{color:#5d6b73;}
+  .join{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.16);border-radius:var(--r);padding:26px;}
+  .join h3{font-family:"Fraunces",serif;color:#fff;margin-top:0;}
+  .join p{color:#cdd9e3;font-size:.95rem;}
+  .join form{display:grid;gap:11px;margin-top:6px;}
+  .join .two{display:grid;grid-template-columns:1fr 1fr;gap:11px;}
+  .join input,.join textarea{width:100%;padding:12px 14px;border-radius:11px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.96);font:inherit;color:var(--ink);}
+  .join textarea{min-height:64px;resize:vertical;}
+  .join .fine{font-size:.8rem;color:#aebeca;margin:0;}
+  .join .msg{font-size:.9rem;border-radius:10px;padding:9px 12px;margin:0;}
+  .join .msg.ok{background:rgba(95,180,120,.2);color:#d7f3df;}
+  .join .msg.err{background:rgba(227,133,47,.22);color:#ffe2c8;}
 
   /* VVF + SIGNUP */
-  #future{background:var(--brand-dark);color:#fff;}
-  #future .eyebrow{color:#ffd9b0;}
-  #future a{color:#ffd9b0;}
-  .future-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center;}
-  @media(max-width:820px){.future-grid{grid-template-columns:1fr;}}
-  .signup{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);border-radius:var(--radius);padding:26px;}
+  #future{background:linear-gradient(180deg,var(--cream-2),#fff);}
+  .future-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:44px;align-items:center;}
+  @media(max-width:880px){.future-grid{grid-template-columns:1fr;}}
+  .signup{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:30px;box-shadow:var(--shadow-sm);}
+  .signup h3{font-family:"Fraunces",serif;margin-top:0;}
   .signup form{display:flex;flex-direction:column;gap:12px;}
-  .signup input{padding:14px 16px;border-radius:12px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.95);font:inherit;}
-  .signup .fine{font-size:.8rem;opacity:.8;margin:0;}
+  .signup input{padding:14px 16px;border-radius:12px;border:1px solid var(--line);font:inherit;background:var(--paper);}
+  .signup .fine{font-size:.82rem;color:var(--muted);margin:0;}
 
   /* FOOTER */
-  footer{background:#221f1b;color:#cfc7bb;}
-  .foot{display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap;padding:46px 0;}
-  footer a{color:#e8c9b3;text-decoration:none;}
-  footer h4{color:#fff;margin:0 0 10px;}
-  .foot-col p{margin:.2em 0;font-size:.92rem;}
-  .foot-bottom{border-top:1px solid #3a352f;padding:18px 0;font-size:.82rem;opacity:.75;text-align:center;}
-  .heart{color:var(--accent);}
+  footer{background:var(--navy-2);color:#b9c6d2;}
+  .foot{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:30px;padding:60px 0 30px;}
+  @media(max-width:740px){.foot{grid-template-columns:1fr 1fr;}}
+  footer h4{color:#fff;font-family:"Fraunces",serif;margin:0 0 12px;font-weight:600;}
+  footer a{color:#e8c9a8;}
+  .foot p{margin:.25em 0;font-size:.93rem;}
+  .foot .brand{color:#fff;margin-bottom:12px;}
+  .foot-bottom{border-top:1px solid rgba(255,255,255,.1);padding:20px 0;text-align:center;font-size:.82rem;opacity:.7;}
+
+  /* PERSISTENT DONATE WIDGET */
+  .fab{position:fixed;right:22px;bottom:22px;z-index:80;}
+  .fab-btn{display:inline-flex;align-items:center;gap:9px;background:var(--orange);color:#fff;border:0;cursor:pointer;
+    font:inherit;font-weight:800;padding:15px 24px;border-radius:999px;box-shadow:0 16px 34px -10px rgba(227,133,47,.75);transition:transform .15s,background .15s;}
+  .fab-btn:hover{transform:translateY(-2px);background:var(--orange-d);}
+  .fab-btn svg{width:20px;height:20px;}
+  .fab-pop{position:absolute;right:0;bottom:64px;width:300px;background:#fff;border-radius:18px;box-shadow:0 24px 60px -16px rgba(19,49,78,.5);
+    border:1px solid var(--line);padding:20px;opacity:0;visibility:hidden;transform:translateY(10px) scale(.98);transition:all .2s;}
+  .fab.open .fab-pop{opacity:1;visibility:visible;transform:translateY(0) scale(1);}
+  .fab-pop h4{font-family:"Fraunces",serif;margin:0 0 4px;color:var(--navy);font-size:1.15rem;}
+  .fab-pop p{font-size:.86rem;color:var(--muted);margin:0 0 14px;}
+  .fab-pop .btn{width:100%;justify-content:center;margin-bottom:9px;padding:12px;}
+  .fab-pop .close{position:absolute;top:10px;right:12px;background:none;border:0;font-size:1.2rem;color:var(--muted);cursor:pointer;line-height:1;}
+  @media(max-width:560px){.fab-pop{width:78vw;}}
+
+  /* RESOURCES FINDER */
+  .finder{margin-top:36px;background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:26px;box-shadow:var(--shadow-sm);}
+  .finder-bar{display:flex;gap:12px;flex-wrap:wrap;}
+  .finder-bar input{flex:1;min-width:200px;padding:14px 16px;border-radius:12px;border:1px solid var(--line);font:inherit;background:var(--paper);}
+  .finder-bar .btn{padding:14px 22px;}
+  .finder-results{margin-top:18px;}
+  .finder-results:empty{display:none;}
+  .fr-pantry{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line);}
+  .fr-pantry b{font-family:"Fraunces",serif;}
+  .fr-dist{color:var(--orange-d);font-weight:800;white-space:nowrap;}
+  .fr-links{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;}
+  .fr-links a{font-size:.9rem;padding:11px 17px;}
+  .fr-note{color:var(--muted);font-size:.94rem;margin:6px 0 0;}
+  .res-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:22px;}
+  @media(max-width:820px){.res-grid{grid-template-columns:1fr;}}
+  .res-card{display:block;background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px;box-shadow:var(--shadow-sm);transition:transform .15s,box-shadow .15s;color:var(--ink);}
+  .res-card:hover{transform:translateY(-3px);box-shadow:var(--shadow);}
+  .res-card b{font-family:"Fraunces",serif;color:var(--navy);font-size:1.08rem;display:block;margin-bottom:4px;}
+  .res-card>span{color:var(--muted);font-size:.92rem;}
+  .res-card .go{color:var(--orange-d);font-weight:800;font-size:.88rem;display:inline-block;margin-top:10px;}
+
+  .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);}
 </style>
 </head>
 <body>
 
+<!-- ===== NAV ===== -->
 <header class="nav">
   <div class="nav-inner">
-    <a class="brand" href="#top"><span class="paw">🐾</span> Free Pet Pantry</a>
+    <a class="brand" href="#top">
+      <span class="mark"><img src="assets/freepetpantry-logo.png" alt="Free Pet Pantry logo" onerror="brandFail(this)" /></span>
+      Free Pet Pantry
+    </a>
     <nav class="nav-links">
       <a href="#how">How it works</a>
       <a href="#donate">Give</a>
-      <a href="#visit">Visit</a>
+      <a href="#network">The Network</a>
+      <a href="#resources">Find help</a>
       <a href="#future">Vet Van Fleet</a>
-      <a class="btn btn-primary" href="#donate">Donate</a>
+      <a class="btn btn-primary" href="#donate">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-8.5-5.6-8.5-11A4.5 4.5 0 0 1 12 7a4.5 4.5 0 0 1 8.5 3c0 5.4-8.5 11-8.5 11z"/></svg>
+        Donate
+      </a>
     </nav>
   </div>
 </header>
 
 <a id="top"></a>
+
+<!-- ===== HERO ===== -->
 <section class="hero">
   <div class="wrap hero-grid">
     <div>
       <span class="eyebrow">A community pet pantry · East Pittsburgh, PA</span>
-      <h1>Take what you need, <span>leave what you can.</span></h1>
-      <p class="lede">A little free pantry stocked with pet food and essentials — open to any pet parent who needs a hand. Because no one should have to choose between feeding their fur babies or themselves.</p>
-      <div class="hero-cta">
-        <a class="btn btn-primary" href="#donate">Help stock the pantry</a>
-        <a class="btn btn-ghost" href="#how">How it works</a>
+      <h1>Take what you need,<br><em>leave what you can.</em></h1>
+      <p class="lead">A little free pantry stocked with pet food and essentials — open to any pet parent who needs a hand. Because no one should have to choose between feeding their fur babies or themselves.</p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="#donate">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-8.5-5.6-8.5-11A4.5 4.5 0 0 1 12 7a4.5 4.5 0 0 1 8.5 3c0 5.4-8.5 11-8.5 11z"/></svg>
+          Support the pantry
+        </a>
+        <a class="btn btn-ghost" href="#network">See the network</a>
+      </div>
+      <div class="trust">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 6 9 17l-5-5"/></svg>
+        Open 24/7 · always free · no sign-up, no questions
       </div>
     </div>
-    <div class="hero-art">
-      <div class="pantry">🏠🐾</div>
-      <div class="tagline">It takes a village.</div>
-      <div class="sub">Free pet food &amp; supplies, 24/7, no questions asked.</div>
+    <div class="badge-wrap">
+      <div class="badge" id="badge">
+        <img src="assets/freepetpantry-logo.png" alt="Free Pet Pantry — take what you need, leave what you can" onerror="badgeFail()" />
+      </div>
     </div>
   </div>
 </section>
 
+<!-- ===== STRIP ===== -->
 <div class="strip">
   <div class="wrap">
     <div><b>24/7</b><span>Open whenever you need it</span></div>
     <div><b>$0</b><span>Always free, no sign-up</span></div>
+    <div><b>1 → many</b><span>A growing national network</span></div>
     <div><b>100%</b><span>Community stocked &amp; shared</span></div>
   </div>
 </div>
 
-<!-- HOW IT WORKS -->
+<!-- ===== HOW ===== -->
 <section class="section" id="how">
   <div class="wrap">
     <span class="eyebrow">How it works</span>
-    <h2>Simple, dignified, and always open</h2>
-    <p style="max-width:60ch;color:var(--muted);">Our pantry is a small stocked cabinet on a front lawn — like a little free library, but for pets. Anyone can stop by anytime.</p>
+    <h2>Simple, dignified, always open</h2>
+    <p class="lead">Our pantry is a small stocked cabinet on a front lawn — like a little free library, but for pets. Anyone can stop by, anytime.</p>
     <div class="cards">
       <div class="card">
-        <div class="ic">🤲</div>
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h6l2-3 3 6 2-3h7"/></svg></div>
         <h3>Take what you need</h3>
         <p>Grab food, treats, litter, or supplies for your pet. No forms, no proof, no questions. If your pet needs it, it's yours.</p>
       </div>
       <div class="card">
-        <div class="ic">🎁</div>
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8v13H3V8M1 3h22v5H1zM10 12h4"/></svg></div>
         <h3>Leave what you can</h3>
         <p>Have a little extra? Drop off unopened pet food or supplies so the next neighbor finds a full shelf. Every bit helps.</p>
       </div>
       <div class="card">
-        <div class="ic">💛</div>
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM23 21v-2a4 4 0 0 0-3-3.87M16 3.13A4 4 0 0 1 16 11"/></svg></div>
         <h3>It takes a village</h3>
         <p>The pantry runs entirely on neighbors looking out for one another and the animals they love. You make it possible.</p>
       </div>
@@ -208,80 +301,143 @@
   </div>
 </section>
 
-<!-- DONATE -->
+<!-- ===== DONATE ===== -->
 <section class="section" id="donate">
+  <div class="wrap center">
+    <span class="eyebrow">Give</span>
+    <h2>Two easy ways to help</h2>
+    <p class="lead">Keep the shelves full and the project growing. Send supplies straight to the pantry, or chip in a few dollars — every gift feeds a furry family member.</p>
+  </div>
   <div class="wrap">
-    <div class="donate-grid">
-      <div>
-        <span class="eyebrow">Give</span>
-        <h2>Help keep the shelves full</h2>
-        <p style="color:var(--muted);">Demand is highest for the basics. Unopened, in-date items are always welcome — drop them in the pantry anytime, or reach out for a larger donation.</p>
-        <ul class="need-list">
-          <li>🐕 Dry dog food</li>
-          <li>🐈 Dry cat food</li>
-          <li>🥫 Wet food (cans/pouches)</li>
-          <li>🧴 Cat litter</li>
-          <li>🦴 Treats &amp; chews</li>
-          <li>🧼 Flea &amp; tick care</li>
-          <li>🥣 Bowls &amp; leashes</li>
-          <li>🧸 Toys &amp; bedding</li>
-        </ul>
+    <div class="give-grid">
+      <div class="give-card amazon">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4zM3 6h18M16 10a4 4 0 0 1-8 0"/></svg></div>
+        <h3>Send supplies</h3>
+        <p>Shop our Amazon Wish List — food, litter, treats, and essentials ship right to us. The easiest way to restock the shelves.</p>
+        <a class="btn" target="_blank" rel="noopener" href="https://www.amazon.com/hz/wishlist/ls/29YPN4KS1VR13?ref_=wl_share">
+          Open our Wish List
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M7 7h10v10"/></svg>
+        </a>
       </div>
-      <div class="give-box">
-        <h3>Three ways to give</h3>
-        <p><strong>1. Drop it off.</strong> Leave unopened supplies in the pantry anytime — see <a href="#visit">Visit</a> for the location.</p>
-        <p><strong>2. Give funds.</strong> A few dollars buys food during shortages and helps us grow.</p>
-        <p><strong>3. Spread the word.</strong> Tell a neighbor who could use it, or who'd love to give.</p>
-        <p style="margin-top:18px;">
-          <a class="btn btn-primary" href="mailto:Team@FenceHole.com?subject=I'd%20like%20to%20donate%20to%20Free%20Pet%20Pantry">Donate or organize a drop-off</a>
-        </p>
-        <p class="fine" style="color:var(--muted);font-size:.82rem;">Money donation link coming soon. For now, email us and we'll set it up.</p>
+      <div class="give-card paypal">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-8.5-5.6-8.5-11A4.5 4.5 0 0 1 12 7a4.5 4.5 0 0 1 8.5 3c0 5.4-8.5 11-8.5 11z"/></svg></div>
+        <h3>Donate cash</h3>
+        <p>A few dollars buys food during shortages and helps us open more pantries. Secure giving through PayPal — no account needed.</p>
+        <a class="btn" target="_blank" rel="noopener" href="https://www.paypal.com/ncp/payment/EZWLVHF9H3YZS">
+          Give with PayPal
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M7 7h10v10"/></svg>
+        </a>
       </div>
     </div>
+    <p class="give-note">Prefer to arrange a larger drop-off or sponsorship? Email <a href="mailto:Team@FenceHole.com">Team@FenceHole.com</a> — we'd love to thank you.</p>
   </div>
 </section>
 
-<!-- VISIT -->
-<section class="section" id="visit">
+<!-- ===== VISIT ===== -->
+<section class="section" id="visit" style="background:var(--cream-2);">
   <div class="wrap">
     <div class="visit-grid">
       <div>
         <span class="eyebrow">Visit</span>
         <h2>Find the pantry</h2>
-        <p style="color:var(--muted);">You'll find us on the <strong>200 block of Highland Avenue in East Pittsburgh, PA 15112</strong> — a small pantry cabinet out front. Use the map for the general block; you'll spot the 🐾 sign when you're close.</p>
+        <p class="lead">You'll find us on the <strong>200 block of Highland Avenue in East Pittsburgh, PA 15112</strong> — a small pantry cabinet out front. Use the map for the general block; you'll spot the 🐾 sign when you're close.</p>
         <p style="color:var(--muted);">Open 24/7. If the shelf is bare or you need something specific, just <a href="mailto:Team@FenceHole.com?subject=Free%20Pet%20Pantry">email us</a> — we're glad to help.</p>
-        <a class="btn btn-ghost" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=Highland%20Avenue%2C%20East%20Pittsburgh%2C%20PA%2015112">Open block in Google Maps ↗</a>
+        <a class="btn btn-outline" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=Highland%20Avenue%2C%20East%20Pittsburgh%2C%20PA%2015112">
+          Open block in Google Maps
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M7 7h10v10"/></svg>
+        </a>
       </div>
-      <div class="map-card">
-        <div class="pin">📍🐾</div>
-        <div class="info">
+      <div class="visit-card">
+        <div class="top"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+        <div class="body">
           <div class="area">200 block of Highland Ave</div>
-          <div class="note">East Pittsburgh, PA 15112 · exact spot shared when you're nearby for everyone's privacy &amp; safety.</div>
+          <div class="sub">East Pittsburgh, PA 15112 · exact spot shared when you're nearby, for everyone's privacy &amp; safety.</div>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- VET VAN FLEET + SIGNUP -->
+<!-- ===== NETWORK ===== -->
+<section class="section" id="network">
+  <div class="wrap">
+    <span class="eyebrow">The Network</span>
+    <h2>One pantry became a movement</h2>
+    <p class="lead">Pet parents everywhere are starting their own free pantries — and we're connecting them into one network. Find a pantry near you, or put yours on the map and join a community that's spreading kindness, block by block.</p>
+    <div class="net-grid">
+      <div id="map" aria-label="Map of free pet pantries"></div>
+      <div class="join">
+        <h3>Add your pantry to the map</h3>
+        <p>Started a free pet pantry — or planning to? Join the network and we'll feature it here so neighbors can find you.</p>
+        <form id="join-form">
+          <input type="text" name="name" placeholder="Pantry name *" required />
+          <div class="two">
+            <input type="text" name="steward_name" placeholder="Your name" />
+            <input type="text" name="city" placeholder="Town / City *" required />
+          </div>
+          <div class="two">
+            <input type="text" name="region" placeholder="State / Region" />
+            <input type="text" name="country" placeholder="Country" value="USA" />
+          </div>
+          <input type="url" name="website" placeholder="Website or social (optional)" />
+          <textarea name="blurb" placeholder="A sentence about your pantry (optional)"></textarea>
+          <input type="email" name="email" placeholder="Email (private — for us to reach you)" />
+          <button class="btn btn-primary" type="submit" style="justify-content:center;">Join the network</button>
+          <p class="fine" id="join-fine">Pins show your town, never an exact address. New pantries appear once we review them.</p>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== RESOURCES FINDER ===== -->
+<section class="section" id="resources" style="background:var(--cream-2);">
+  <div class="wrap">
+    <span class="eyebrow">Find help anywhere</span>
+    <h2>Can't make it to us? Find pet help near you.</h2>
+    <p class="lead">Wherever you are, there's likely free pet food and care nearby. Share your location or type a ZIP, and we'll point you to the closest pantries plus trusted national finders. No one should face this alone.</p>
+
+    <div class="finder">
+      <div class="finder-bar">
+        <input id="loc-input" type="text" placeholder="ZIP code or city, state" autocomplete="postal-code" />
+        <button class="btn btn-primary" id="find-btn" type="button">Find help</button>
+        <button class="btn btn-outline" id="geo-btn" type="button">Use my location</button>
+      </div>
+      <div class="finder-results" id="finder-results"></div>
+    </div>
+
+    <h3 style="margin-top:52px;">Trusted national resources</h3>
+    <p style="color:var(--muted);max-width:62ch;">These help everywhere in the U.S. — keep them handy, or share with a neighbor who needs them.</p>
+    <div class="res-grid">
+      <a class="res-card" target="_blank" rel="noopener" href="https://www.pethelpfinder.org/"><b>Pet Help Finder</b><span>Search thousands of pet food pantries, low-cost vets &amp; supplies by ZIP.</span><span class="go">Search now →</span></a>
+      <a class="res-card" target="_blank" rel="noopener" href="https://petsofthehomeless.org/get-help/"><b>Pets of the Homeless</b><span>A national pet food bank network — find a distribution site near you.</span><span class="go">Find a site →</span></a>
+      <a class="res-card" target="_blank" rel="noopener" href="https://www.humaneworld.org/en/resources/having-trouble-affording-your-pet"><b>Trouble affording your pet?</b><span>The Humane Society's hub of free &amp; low-cost food and vet care.</span><span class="go">Get help →</span></a>
+      <a class="res-card" target="_blank" rel="noopener" href="https://redrover.org/relief/"><b>RedRover Relief</b><span>Emergency grants when a pet needs urgent, life-saving vet care.</span><span class="go">Apply →</span></a>
+      <a class="res-card" target="_blank" rel="noopener" href="https://www.211.org/"><b>Dial 211 — United Way</b><span>Free, confidential local help, including pet food. Call or search online.</span><span class="go">Open 211 →</span></a>
+      <a class="res-card" target="_blank" rel="noopener" href="https://www.feedingamerica.org/find-your-local-foodbank"><b>Feeding America</b><span>Find your local food bank — many now stock pet food too.</span><span class="go">Find a food bank →</span></a>
+    </div>
+    <p class="fr-note" style="margin-top:18px;">Know a great local program we should add? Tell us at <a href="mailto:Team@FenceHole.com">Team@FenceHole.com</a>.</p>
+  </div>
+</section>
+
+<!-- ===== VVF + SIGNUP ===== -->
 <section class="section" id="future">
   <div class="wrap">
     <div class="future-grid">
       <div>
         <span class="eyebrow">What's next · Vet Van Fleet</span>
-        <h2>From a pantry to a movement</h2>
-        <p>Free Pet Pantry is the first step. We're building toward <strong>Vet Van Fleet</strong> — a nonprofit initiative bringing free veterinary care to pets everywhere, wherever they are. Food keeps pets fed; healthcare keeps them well. We believe every pet deserves both.</p>
-        <p style="opacity:.85;">A project of <strong>The Fence Hole Group</strong> · <a href="https://fencehole.com" target="_blank" rel="noopener">fencehole.com</a> · <a href="https://vetvanfleet.com" target="_blank" rel="noopener">vetvanfleet.com</a></p>
-        <p style="opacity:.85;">Questions, donations, or partnerships: <a href="mailto:Team@FenceHole.com">Team@FenceHole.com</a></p>
+        <h2>From a pantry to free care for every pet</h2>
+        <p class="lead">Free Pet Pantry is the first step. We're building toward <strong>Vet Van Fleet</strong> — a nonprofit initiative bringing free veterinary care to pets everywhere they are. Food keeps pets fed; healthcare keeps them well. Every pet deserves both.</p>
+        <p style="color:var(--muted);">A project of <strong>The Fence Hole Group</strong> · <a href="https://fencehole.com" target="_blank" rel="noopener">fencehole.com</a> · <a href="https://vetvanfleet.com" target="_blank" rel="noopener">vetvanfleet.com</a></p>
+        <p style="color:var(--muted);">Questions, donations, or partnerships: <a href="mailto:Team@FenceHole.com">Team@FenceHole.com</a></p>
       </div>
       <div class="signup">
-        <h3 style="margin-top:0;">Stay in the loop</h3>
-        <p style="opacity:.9;font-size:.95rem;">Get updates on the pantry and the launch of Vet Van Fleet.</p>
-        <!-- Wired to the Fence Hole Hub (Supabase). Signups land tagged brand=freepetpantry. -->
+        <h3>Stay in the loop</h3>
+        <p style="color:var(--muted);">Get updates on the pantry and the launch of Vet Van Fleet.</p>
         <form id="signup-form">
           <input type="text" name="name" placeholder="Your name" autocomplete="name" />
           <input type="email" name="email" placeholder="you@email.com" autocomplete="email" required />
-          <button class="btn btn-primary" type="submit">Keep me posted</button>
+          <button class="btn btn-primary" type="submit" style="justify-content:center;">Keep me posted</button>
           <p class="fine" id="signup-msg">We'll only email about the pantry &amp; Vet Van Fleet. No spam, unsubscribe anytime.</p>
         </form>
       </div>
@@ -289,71 +445,207 @@
   </div>
 </section>
 
+<!-- ===== FOOTER ===== -->
 <footer>
   <div class="wrap foot">
-    <div class="foot-col">
-      <h4>🐾 Free Pet Pantry</h4>
+    <div>
+      <div class="brand" style="display:flex;align-items:center;gap:12px;">
+        <span class="mark" style="width:40px;height:40px;border-radius:50%;overflow:hidden;display:inline-block;box-shadow:0 0 0 2px rgba(255,255,255,.15);"><img src="assets/freepetpantry-logo.png" alt="" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'" /></span>
+        Free Pet Pantry
+      </div>
       <p>Take what you need, leave what you can.</p>
       <p>200 block of Highland Ave · East Pittsburgh, PA 15112</p>
       <p><a href="mailto:Team@FenceHole.com">Team@FenceHole.com</a></p>
     </div>
-    <div class="foot-col">
+    <div>
       <h4>Explore</h4>
       <p><a href="#how">How it works</a></p>
       <p><a href="#donate">Give</a></p>
+      <p><a href="#network">The Network</a></p>
       <p><a href="#visit">Visit the pantry</a></p>
-      <p><a href="https://vetvanfleet.com" target="_blank" rel="noopener">Vet Van Fleet ↗</a></p>
     </div>
-    <div class="foot-col">
+    <div>
       <h4>The Fence Hole Group</h4>
-      <p>Free Pet Pantry and Vet Van Fleet are initiatives of The Fence Hole Group.</p>
+      <p>Free Pet Pantry &amp; Vet Van Fleet are initiatives of The Fence Hole Group.</p>
       <p><a href="https://fencehole.com" target="_blank" rel="noopener">fencehole.com ↗</a></p>
-      <p><a href="mailto:Team@FenceHole.com">Team@FenceHole.com</a></p>
+      <p><a href="https://vetvanfleet.com" target="_blank" rel="noopener">vetvanfleet.com ↗</a></p>
     </div>
   </div>
   <div class="foot-bottom">
-    Made with <span class="heart">♥</span> for pets and the people who love them · © <span id="yr"></span> The Fence Hole Group
+    Made with ♥ for pets and the people who love them · © <span id="yr"></span> The Fence Hole Group
   </div>
 </footer>
 
+<!-- ===== PERSISTENT DONATE WIDGET ===== -->
+<div class="fab" id="fab">
+  <div class="fab-pop">
+    <button class="close" onclick="toggleFab(false)" aria-label="Close">×</button>
+    <h4>It takes a village 🐾</h4>
+    <p>Two quick ways to keep the shelves full:</p>
+    <a class="btn btn-navy" target="_blank" rel="noopener" href="https://www.amazon.com/hz/wishlist/ls/29YPN4KS1VR13?ref_=wl_share">Send supplies (Wish List)</a>
+    <a class="btn btn-primary" target="_blank" rel="noopener" href="https://www.paypal.com/ncp/payment/EZWLVHF9H3YZS">Donate cash (PayPal)</a>
+  </div>
+  <button class="fab-btn" onclick="toggleFab()" aria-label="Donate">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-8.5-5.6-8.5-11A4.5 4.5 0 0 1 12 7a4.5 4.5 0 0 1 8.5 3c0 5.4-8.5 11-8.5 11z"/></svg>
+    Donate
+  </button>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <script>
+  // ---------- config ----------
+  const SB_URL = "https://potmeockcwrcqmwgyejx.supabase.co";
+  const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBvdG1lb2NrY3dyY3Ftd2d5ZWp4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYyODk1MjUsImV4cCI6MjA5MTg2NTUyNX0.ES4MRM-Sy3vf_h4SS99T9lH7Tsa69wpktzVuZ0ia27k";
+  const fn = (n) => SB_URL + "/functions/v1/" + n;
+  const hdr = { "Content-Type": "application/json", "apikey": SB_KEY, "Authorization": "Bearer " + SB_KEY };
+
   document.getElementById('yr').textContent = new Date().getFullYear();
 
-  // --- Mailing list signup -> Fence Hole Hub ---
+  // ---------- logo fallbacks ----------
+  function brandFail(img){ img.outerHTML = '<svg viewBox="0 0 40 40" width="42" height="42"><circle cx="20" cy="20" r="20" fill="#13314e"/><path d="M14 24a6 6 0 0 1 12 0z" fill="#f7f1e1"/><circle cx="14" cy="15" r="2.4" fill="#e3852f"/><circle cx="20" cy="13" r="2.4" fill="#e3852f"/><circle cx="26" cy="15" r="2.4" fill="#e3852f"/></svg>'; }
+  function badgeFail(){
+    const b = document.getElementById('badge'); b.classList.add('no-logo');
+    b.innerHTML = '<svg viewBox="0 0 200 200" width="100%" height="100%" style="display:block;background:#13314e">' +
+      '<circle cx="100" cy="100" r="98" fill="#13314e"/><circle cx="100" cy="100" r="78" fill="#f7f1e1"/>' +
+      '<path id="t" d="M100 28a72 72 0 1 1 0 144 72 72 0 1 1 0-144" fill="none"/>' +
+      '<text fill="#13314e" font-family="Fraunces,serif" font-size="15" font-weight="700" letter-spacing="3">' +
+      '<textPath href="#t" startOffset="6%">FREE PET PANTRY · TAKE WHAT YOU NEED ·</textPath></text>' +
+      '<path d="M100 120a18 18 0 0 1 34 0z" fill="#13314e"/><circle cx="84" cy="96" r="7" fill="#e3852f"/>' +
+      '<circle cx="100" cy="90" r="7" fill="#e3852f"/><circle cx="116" cy="96" r="7" fill="#d8a23e"/>' +
+      '</svg>';
+  }
+
+  // ---------- donate FAB ----------
+  function toggleFab(force){
+    const f = document.getElementById('fab');
+    if(force === false){ f.classList.remove('open'); return; }
+    f.classList.toggle('open');
+  }
+  document.addEventListener('click', (e)=>{
+    const f = document.getElementById('fab');
+    if(f.classList.contains('open') && !f.contains(e.target)) f.classList.remove('open');
+  });
+
+  // ---------- mailing signup ----------
   (function(){
-    var ENDPOINT = "https://potmeockcwrcqmwgyejx.supabase.co/functions/v1/subscribe";
-    var KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBvdG1lb2NrY3dyY3Ftd2d5ZWp4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYyODk1MjUsImV4cCI6MjA5MTg2NTUyNX0.ES4MRM-Sy3vf_h4SS99T9lH7Tsa69wpktzVuZ0ia27k";
-    var BRAND = "freepetpantry";
-    var form = document.getElementById('signup-form');
-    var msg = document.getElementById('signup-msg');
-    if(!form) return;
-    form.addEventListener('submit', async function(e){
+    const form = document.getElementById('signup-form'), msg = document.getElementById('signup-msg');
+    form.addEventListener('submit', async (e)=>{
       e.preventDefault();
-      var btn = form.querySelector('button');
-      var email = form.email.value.trim();
-      var name = form.name.value.trim();
+      const btn = form.querySelector('button'), orig = btn.textContent;
+      const email = form.email.value.trim(), name = form.name.value.trim();
       if(!email) return;
-      var orig = btn.textContent;
       btn.disabled = true; btn.textContent = 'Signing up…';
       try{
-        var res = await fetch(ENDPOINT, {
-          method:'POST',
-          headers:{'Content-Type':'application/json','apikey':KEY,'Authorization':'Bearer '+KEY},
-          body: JSON.stringify({email:email, name:name, brand:BRAND, source:'freepetpantry.com'})
-        });
-        var data = await res.json().catch(function(){return {};});
-        if(res.ok && data.ok){
-          form.reset();
-          msg.textContent = "You're on the list! Watch your inbox. 🐾";
-          btn.textContent = 'Subscribed ✓';
-        } else {
-          msg.textContent = "That didn't go through — email Team@FenceHole.com and we'll add you.";
-          btn.disabled = false; btn.textContent = orig;
-        }
-      }catch(err){
-        msg.textContent = "Network hiccup. Try again, or email Team@FenceHole.com.";
-        btn.disabled = false; btn.textContent = orig;
+        const r = await fetch(fn('subscribe'), { method:'POST', headers:hdr,
+          body: JSON.stringify({ email, name, brand:'freepetpantry', source:'freepetpantry.com' }) });
+        const d = await r.json().catch(()=>({}));
+        if(r.ok && d.ok){ form.reset(); msg.textContent = "You're on the list! Watch your inbox. 🐾"; btn.textContent='Subscribed ✓'; }
+        else { msg.textContent = "That didn't go through — email Team@FenceHole.com and we'll add you."; btn.disabled=false; btn.textContent=orig; }
+      }catch(_){ msg.textContent = "Network hiccup. Try again, or email Team@FenceHole.com."; btn.disabled=false; btn.textContent=orig; }
+    });
+  })();
+
+  // ---------- network map ----------
+  const pawIcon = L.divIcon({ className:'', iconSize:[34,34], iconAnchor:[17,33], popupAnchor:[0,-30],
+    html: '<svg viewBox="0 0 34 44" width="34" height="44"><path d="M17 43C9 31 3 25 3 16a14 14 0 0 1 28 0c0 9-6 15-14 27z" fill="#e3852f" stroke="#fff" stroke-width="2"/><circle cx="17" cy="15" r="6" fill="#fff"/></svg>' });
+
+  const map = L.map('map', { scrollWheelZoom:false }).setView([39.5, -98.35], 4);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 18, attribution: '&copy; OpenStreetMap contributors'
+  }).addTo(map);
+
+  (async function loadPins(){
+    try{
+      const r = await fetch(fn('list-pantries'), { headers: hdr });
+      const d = await r.json();
+      const pts = (d.pantries||[]).filter(p => p.lat && p.lng);
+      window.__pantries = pts;
+      const group = [];
+      pts.forEach(p=>{
+        const where = [p.city, p.region].filter(Boolean).join(', ');
+        const site = p.website ? '<br><a href="'+p.website+'" target="_blank" rel="noopener">visit ↗</a>' : '';
+        const blurb = p.blurb ? '<br><small>'+p.blurb+'</small>' : '';
+        const m = L.marker([p.lat, p.lng], { icon: pawIcon }).addTo(map)
+          .bindPopup('<div class="pin-pop"><b>'+p.name+'</b><br><small>'+where+'</small>'+blurb+site+'</div>');
+        group.push([p.lat, p.lng]);
+      });
+      if(group.length > 1){ map.fitBounds(group, { padding:[40,40], maxZoom:7 }); }
+      else if(group.length === 1){ map.setView(group[0], 6); }
+    }catch(_){ /* map still shows */ }
+  })();
+
+  // ---------- join the network ----------
+  (function(){
+    const form = document.getElementById('join-form'), fine = document.getElementById('join-fine');
+    function setMsg(t, kind){ fine.textContent = t; fine.className = 'msg ' + kind; }
+    async function geocode(q){
+      try{
+        const r = await fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&q='+encodeURIComponent(q), { headers:{ 'Accept':'application/json' }});
+        const d = await r.json();
+        if(d && d[0]) return { lat:parseFloat(d[0].lat), lng:parseFloat(d[0].lon) };
+      }catch(_){}
+      return null;
+    }
+    form.addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      const btn = form.querySelector('button'), orig = btn.textContent;
+      const f = Object.fromEntries(new FormData(form).entries());
+      if(!f.name || !f.city){ return; }
+      btn.disabled = true; btn.textContent = 'Adding…'; setMsg('Locating your town…','ok');
+      const loc = await geocode([f.city, f.region, f.country].filter(Boolean).join(', '));
+      if(loc){ f.lat = loc.lat; f.lng = loc.lng; }
+      try{
+        const r = await fetch(fn('join-network'), { method:'POST', headers:hdr, body: JSON.stringify(f) });
+        const d = await r.json().catch(()=>({}));
+        if(r.ok && d.ok){ form.reset(); setMsg("Thank you! Your pantry will appear on the map once we review it. 🐾",'ok'); btn.textContent='Submitted ✓'; }
+        else { setMsg("Couldn't submit — please email Team@FenceHole.com.",'err'); btn.disabled=false; btn.textContent=orig; }
+      }catch(_){ setMsg("Network hiccup. Try again, or email Team@FenceHole.com.",'err'); btn.disabled=false; btn.textContent=orig; }
+    });
+  })();
+
+  // ---------- find help near you ----------
+  (function(){
+    const input = document.getElementById('loc-input');
+    const out = document.getElementById('finder-results');
+    function miles(a,b,c,d){const R=3958.8,toR=x=>x*Math.PI/180;const dLat=toR(c-a),dLng=toR(d-b);const s=Math.sin(dLat/2)**2+Math.cos(toR(a))*Math.cos(toR(c))*Math.sin(dLng/2)**2;return Math.round(R*2*Math.atan2(Math.sqrt(s),Math.sqrt(1-s)));}
+    function esc(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+    async function fwd(q){try{const r=await fetch('https://nominatim.openstreetmap.org/search?format=json&countrycodes=us&limit=1&q='+encodeURIComponent(q),{headers:{Accept:'application/json'}});const d=await r.json();if(d&&d[0])return{lat:+d[0].lat,lng:+d[0].lon};}catch(_){}return null;}
+    async function rev(lat,lng){try{const r=await fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat='+lat+'&lon='+lng,{headers:{Accept:'application/json'}});const d=await r.json();const a=d.address||{};return [a.city||a.town||a.village||a.county,a.state,a.postcode].filter(Boolean).join(', ');}catch(_){return '';}}
+    function render(lat,lng,label){
+      const q = encodeURIComponent('free pet food pantry '+(label||''));
+      const pantries = (window.__pantries||[]).map(p=>({...p,d:miles(lat,lng,p.lat,p.lng)})).sort((x,y)=>x.d-y.d).slice(0,3);
+      let html = '';
+      if(pantries.length){
+        html += '<p class="fr-note">Closest pantries in our network'+(label?(' to <strong>'+esc(label)+'</strong>'):'')+':</p>';
+        pantries.forEach(p=>{ const site=p.website?(' · <a href="'+p.website+'" target="_blank" rel="noopener">visit</a>'):''; html += '<div class="fr-pantry"><span><b>'+esc(p.name)+'</b><br><small style="color:var(--muted)">'+esc([p.city,p.region].filter(Boolean).join(', '))+'</small>'+site+'</span><span class="fr-dist">'+p.d+' mi</span></div>'; });
+      } else {
+        html += '<p class="fr-note">No network pantries near you yet — <a href="#network">be the first to add one</a>. These live finders cover your area now:</p>';
       }
+      html += '<div class="fr-links">'
+        + '<a class="btn btn-navy" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query='+q+'">Live map of pantries near you ↗</a>'
+        + '<a class="btn btn-ghost" target="_blank" rel="noopener" href="https://www.pethelpfinder.org/">Pet Help Finder ↗</a>'
+        + '<a class="btn btn-ghost" target="_blank" rel="noopener" href="https://petsofthehomeless.org/get-help/">Pets of the Homeless ↗</a>'
+        + '<a class="btn btn-ghost" target="_blank" rel="noopener" href="https://www.211.org/">Dial 211 ↗</a>'
+        + '</div>';
+      out.innerHTML = html;
+    }
+    async function run(text){
+      out.innerHTML = '<p class="fr-note">Searching near '+esc(text)+'…</p>';
+      const loc = await fwd(text);
+      if(!loc){ out.innerHTML = '<p class="fr-note">Couldn’t find that place — try a ZIP code, or browse the national resources below.</p>'; return; }
+      render(loc.lat, loc.lng, text);
+    }
+    document.getElementById('find-btn').addEventListener('click', ()=>{ const v=input.value.trim(); if(v) run(v); });
+    input.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); const v=input.value.trim(); if(v) run(v); } });
+    document.getElementById('geo-btn').addEventListener('click', ()=>{
+      if(!navigator.geolocation){ out.innerHTML='<p class="fr-note">Your browser can’t share location — type a ZIP instead.</p>'; return; }
+      out.innerHTML = '<p class="fr-note">Getting your location…</p>';
+      navigator.geolocation.getCurrentPosition(async (pos)=>{
+        const lat = pos.coords.latitude, lng = pos.coords.longitude;
+        const label = await rev(lat,lng);
+        if(label) input.value = label;
+        render(lat,lng,label);
+      }, ()=>{ out.innerHTML='<p class="fr-note">Couldn’t get your location — type a ZIP code instead.</p>'; }, {timeout:8000});
     });
   })();
 </script>
