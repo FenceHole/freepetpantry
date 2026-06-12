@@ -174,21 +174,6 @@
   .foot .brand{color:#fff;margin-bottom:12px;}
   .foot-bottom{border-top:1px solid rgba(255,255,255,.1);padding:20px 0;text-align:center;font-size:.82rem;opacity:.7;}
 
-  /* PERSISTENT DONATE WIDGET */
-  .fab{position:fixed;right:22px;bottom:22px;z-index:80;}
-  .fab-btn{display:inline-flex;align-items:center;gap:9px;background:var(--orange);color:#fff;border:0;cursor:pointer;
-    font:inherit;font-weight:800;padding:15px 24px;border-radius:999px;box-shadow:0 16px 34px -10px rgba(227,133,47,.75);transition:transform .15s,background .15s;}
-  .fab-btn:hover{transform:translateY(-2px);background:var(--orange-d);}
-  .fab-btn svg{width:20px;height:20px;}
-  .fab-pop{position:absolute;right:0;bottom:64px;width:300px;background:#fff;border-radius:18px;box-shadow:0 24px 60px -16px rgba(19,49,78,.5);
-    border:1px solid var(--line);padding:20px;opacity:0;visibility:hidden;transform:translateY(10px) scale(.98);transition:all .2s;}
-  .fab.open .fab-pop{opacity:1;visibility:visible;transform:translateY(0) scale(1);}
-  .fab-pop h4{font-family:"Fraunces",serif;margin:0 0 4px;color:var(--navy);font-size:1.15rem;}
-  .fab-pop p{font-size:.86rem;color:var(--muted);margin:0 0 14px;}
-  .fab-pop .btn{width:100%;justify-content:center;margin-bottom:9px;padding:12px;}
-  .fab-pop .close{position:absolute;top:10px;right:12px;background:none;border:0;font-size:1.2rem;color:var(--muted);cursor:pointer;line-height:1;}
-  @media(max-width:560px){.fab-pop{width:78vw;}}
-
   /* RESOURCES FINDER */
   .finder{margin-top:36px;background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:26px;box-shadow:var(--shadow-sm);}
   .finder-bar{display:flex;gap:12px;flex-wrap:wrap;}
@@ -476,21 +461,6 @@
   </div>
 </footer>
 
-<!-- ===== PERSISTENT DONATE WIDGET ===== -->
-<div class="fab" id="fab">
-  <div class="fab-pop">
-    <button class="close" onclick="toggleFab(false)" aria-label="Close">×</button>
-    <h4>It takes a village 🐾</h4>
-    <p>Two quick ways to keep the shelves full:</p>
-    <a class="btn btn-navy" target="_blank" rel="noopener" href="https://www.amazon.com/hz/wishlist/ls/29YPN4KS1VR13?ref_=wl_share">Send supplies (Wish List)</a>
-    <a class="btn btn-primary" target="_blank" rel="noopener" href="https://www.paypal.com/ncp/payment/EZWLVHF9H3YZS">Donate cash (PayPal)</a>
-  </div>
-  <button class="fab-btn" onclick="toggleFab()" aria-label="Donate">
-    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-8.5-5.6-8.5-11A4.5 4.5 0 0 1 12 7a4.5 4.5 0 0 1 8.5 3c0 5.4-8.5 11-8.5 11z"/></svg>
-    Donate
-  </button>
-</div>
-
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <script>
   // ---------- config ----------
@@ -514,17 +484,6 @@
       '<circle cx="100" cy="90" r="7" fill="#e3852f"/><circle cx="116" cy="96" r="7" fill="#d8a23e"/>' +
       '</svg>';
   }
-
-  // ---------- donate FAB ----------
-  function toggleFab(force){
-    const f = document.getElementById('fab');
-    if(force === false){ f.classList.remove('open'); return; }
-    f.classList.toggle('open');
-  }
-  document.addEventListener('click', (e)=>{
-    const f = document.getElementById('fab');
-    if(f.classList.contains('open') && !f.contains(e.target)) f.classList.remove('open');
-  });
 
   // ---------- mailing signup ----------
   (function(){
